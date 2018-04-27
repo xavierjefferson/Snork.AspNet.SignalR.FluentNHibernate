@@ -1,7 +1,5 @@
-﻿# Hangfire FluentNHibernate Storage - An Implementation for MS SQL Server, MySQL, PostgreSQL, Oracle, Firebird, and DB/2
+﻿#  FluentNHibernate Backplane for SignalR  - An Implementation for MS SQL Server, MySQL, PostgreSQL, Oracle, Firebird, and DB/2
 [![Latest version](https://img.shields.io/nuget/v/Snork.AspNet.SignalR.FluentNHibernate.svg)](https://www.nuget.org/packages/Snork.AspNet.SignalR.FluentNHibernate/) 
-
-FluentNHibernate storage implementation of a backplane for SignalR.
 
 This is an NHibernate-backed implementation of a SignalR backplane that supports MS SQL Server, MySQL, PostgreSQL, Oracle, Firebird, and DB/2.  When deployed, this library will automatically generate tables required for storing SignalR metadata, and pass the correct SQL flavor to the database transparently.  The intention of doing an implementation like this one is to be able to share tentative improvements with a broad audience of developers.
 
