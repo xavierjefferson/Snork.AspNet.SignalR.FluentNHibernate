@@ -101,7 +101,6 @@ Please use Visual Studio or any other tool of your choice to build the solution
 
 # Database Stuff
 
- - **IMPORTANT**:  The Hangfire engine, with its 20 default worker threads, is not database-intensive but it can be VERY chatty.
  - During first-time use, you'll need table-creation rights on your RDBMS.
  - You can't specify table names (yet).  But you can specify the schema.  See the sample code.
  - Since this uses an OR/M, there are no stored procedures or views to be installed.
