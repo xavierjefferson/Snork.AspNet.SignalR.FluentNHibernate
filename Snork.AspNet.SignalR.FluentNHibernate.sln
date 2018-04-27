@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{
 		DriverPackage.md = DriverPackage.md
 		LICENSE.MD = LICENSE.MD
 		README.md = README.md
+		nuspecs\Snork.AspNet.SignalR.FluentNHibernate.nuspec = nuspecs\Snork.AspNet.SignalR.FluentNHibernate.nuspec
 	EndProjectSection
 EndProject
 Global

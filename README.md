@@ -3,12 +3,11 @@
 
 FluentNHibernate storage implementation of a backplane for SignalR.
 
-Forked from [Hangfire.MySqlStorage](https://github.com/arnoldasgudas/Hangfire.MySqlStorage), this is an NHibernate-backed implementation of a Hangfire storage provider that supports MS SQL Server, MySQL, PostgreSQL, Oracle, Firebird, and DB/2.  When deployed in a Hangfire instance, this library will automatically generate tables required for storing Hangfire metadata, and pass the correct SQL flavor to the database transparently.  The intention of doing an implementation like this one is to be able to share tentative improvements with a broad audience of developers.
+This is an NHibernate-backed implementation of a SignalR backplane that supports MS SQL Server, MySQL, PostgreSQL, Oracle, Firebird, and DB/2.  When deployed, this library will automatically generate tables required for storing SignalR metadata, and pass the correct SQL flavor to the database transparently.  The intention of doing an implementation like this one is to be able to share tentative improvements with a broad audience of developers.
 
-FluentNHibernate / NHibernate enthusiasts may note that while NHibernate supports the SQLite, MS Access (Jet), and SQL Server Compact Edition desktop databases, none of these proved to work, and there's no plan to support them.
+FluentNHibernate / NHibernate enthusiasts may note that while NHibernate supports the SQLite, MS Access (Jet), and SQL Server Compact Edition desktop databases, none of these are likely to work correctly because they're wonky with multithreading, and there's no plan to support them.
 
 ## Installation
-
 
 Run the following command in the NuGet Package Manager console to install Snork.AspNet.SignalR.FluentNHibernate:
 
@@ -17,9 +16,6 @@ Install-Package Snork.AspNet.SignalR.FluentNHibernate
 ```
 
 You will need to install an [additional driver package](DriverPackage.md) for all RDBMS systems except SQL Server.
-
- 
-
 
 ## Database Implementation Notes
 The package includes an enumeration of database providers AND their specific flavors of SQL across various SQL versions:
@@ -48,129 +44,62 @@ The package includes an enumeration of database providers AND their specific fla
 ```
 The enumeration values correspond to the list of providers NHibernate supports.  When you instantiate a provider, you'll pass the best enumeration value to the FluentNHibernateStorageFactory.For method, along with your connection string.  I wrote it this way so you don't have to be concerned with the underlying implementation details for the various providers, which can be a little messy.  
 
-### MS Sql Server
-You'll note that four versions of SQL Server are included.  If you're using MS SQL Server 2000 (and I hope you're not), you may have a rough time because the database does not support strings longer than 8000 characters.  This implementation was tested against MS Sql Server 2012 and 2008.
 
 ### Oracle
-Be advised that two of the four Oracle options (OracleClient9Managed, OracleClient10Managed) use the **Oracle.ManagedDataAccess** client library internally, while the other two (OracleClient9, OracleClient10) use the **System.Data.OracleClient** client library.  I'm not Oracle savvy, and I could only get **Oracle.ManagedDataAccess** to work properly (the other is NHibernate's default).  You may have a different experience.  This implementation was tested against Oracle 11g Express on Oracle Linux.
+Be advised that two of the four Oracle options (OracleClient9Managed, OracleClient10Managed) use the **Oracle.ManagedDataAccess** client library internally, while the other two (OracleClient9, OracleClient10) use the **System.Data.OracleClient** client library.  I'm not Oracle savvy, and I could only get **Oracle.ManagedDataAccess** to work properly (the other is NHibernate's default).  You may have a different experience.
 
-### PostgreSQL
-This implementation was tested against PostgreSQL 10 on Ubuntu 12.
-
-### DB/2
-This implementation was tested against IBM® Db2® Express-C on Windows.
-
-### MySQL
-This implementation was tested against MySQL 5.7.20 on Ubuntu 16.
-
-### Firebird
-I set out to test this implementation on all the RDBMS systems NHibernate supports, and this was the last on the list.  I could not get a database instance to work.  Your mileage may vary :)
-
-## Usage - Within an ASP.NET Application
-I may simplify the implementation later, but I think this code is pretty painless  Usage within an ASP.Net application would probably employ the OWin startup approach for Hangfire, which is pretty well-documented.  Please note the properties, which include specifying a database schema, passed to the method:
+## Usage - Simple connection string and provider type approach
+I may simplify the implementation later, but I think this code is pretty painless  Usage within an application would probably employ the OWin startup approach for SignalR, which is pretty well-documented.  Please note the properties, which MAY include specifying a database schema, passed to the method:
 ```
+using Microsoft.AspNet.SignalR;
+using Microsoft.Owin.Cors;
+using Owin;
+using Snork.AspNet.SignalR.FluentNHibernate;
+using Snork.FluentNHibernateTools;
+
+namespace SignalRSelfHost
+{
+    internal class Startup
+    {
         public void Configuration(IAppBuilder app)
         {
-            //Configure properties (this is optional)
-            var options = new FluentNHibernateStorageOptions
-            {
-                TransactionIsolationLevel = IsolationLevel.ReadCommitted,
-                QueuePollInterval = TimeSpan.FromSeconds(15),
-                JobExpirationCheckInterval = TimeSpan.FromHours(1),
-                CountersAggregateInterval = TimeSpan.FromMinutes(5),
-                PrepareSchemaIfNecessary = true,
-                DashboardJobListLimit = 50000,
-                TransactionTimeout = TimeSpan.FromMinutes(1),
-				DefaultSchema = null // use database provider's default schema
-            };           
-            var storage = FluentNHibernateStorageFactory.For(ProviderTypeEnum.MySQL, "MyConnectionStringHere", options);
-            GlobalConfiguration.Configuration
-                .UseStorage(storage);
-            /*** More Hangfire configuration stuff 
-            would go in this same method ***/
-         }
+            app.UseCors(CorsOptions.AllowAll);
+            GlobalHost.DependencyResolver.UseFluentNHibernate(
+                "Server=myServerAddress;Database=myDataBase;Uid=myUsername;Pwd=myPassword;", ProviderTypeEnum.MySQL);
+            app.MapSignalR();
+        }
+    }
+}
 ```
-## Usage - A Standalone Server
+## Usage - more verbose
 ```
-using System;
-using System.Configuration;
-using System.Transactions;
+using Microsoft.AspNet.SignalR;
+using Microsoft.Owin.Cors;
+using Owin;
 using Snork.AspNet.SignalR.FluentNHibernate;
+using Snork.FluentNHibernateTools;
 
-namespace Hangfire.FluentNHibernate.SampleApplication
+namespace SignalRSelfHost
 {
-    public class DemoClass
+    internal class Startup
     {
-        private static BackgroundJobServer _backgroundJobServer;
-
-        private static void Main(string[] args)
+        public void Configuration(IAppBuilder app)
         {
-            //Configure properties (this is optional)
-            var options = new FluentNHibernateStorageOptions
-            {
-                TransactionIsolationLevel = IsolationLevel.ReadCommitted,
-                QueuePollInterval = TimeSpan.FromSeconds(15),
-                JobExpirationCheckInterval = TimeSpan.FromHours(1),
-                CountersAggregateInterval = TimeSpan.FromMinutes(5),
-                PrepareSchemaIfNecessary = true,
-                DashboardJobListLimit = 50000,
-                TransactionTimeout = TimeSpan.FromMinutes(1),
-				DefaultSchema = null // use database provider's default schema
-            };
-
-            //THIS SECTION GETS THE STORAGE PROVIDER
-            var PersistenceConfigurerType = ProviderTypeEnum.MsSql2012;
-            var connectionString = ConfigurationManager.ConnectionStrings["someConnectionString"].ConnectionString;
-            var storage = FluentNHibernateStorageFactory.For(PersistenceConfigurerType, connectionString, options);
-
-            //THIS LINE CONFIGURES HANGFIRE WITH THE STORAGE PROVIDER
-            GlobalConfiguration.Configuration.UseStorage(storage);
-            /*THIS LINE STARTS THE BACKGROUND SERVER*/
-            _backgroundJobServer = new BackgroundJobServer(new BackgroundJobServerOptions(), storage,
-                storage.GetBackgroundProcesses());
-            /*AND... DONE.*/
-            Console.WriteLine("Background job server is running.  Press [ENTER] to quit.");
-            Console.ReadLine();
+            app.UseCors(CorsOptions.AllowAll);
+            GlobalHost.DependencyResolver.UseFluentNHibernate(
+                new FNHScaleoutConfiguration("Server=.\\sqlexpress;Database=signalrtest;Trusted_Connection=True;",
+                    ProviderTypeEnum.MsSql2008) {TableCount = 2, DefaultSchema = "dbo"});
+            app.MapSignalR();
         }
     }
 }
 ```
 Description of optional parameters:
-- `TransactionIsolationLevel` - transaction isolation level. Default is read committed.
-- `QueuePollInterval` - job queue polling interval. Default is 15 seconds.
-- `JobExpirationCheckInterval` - job expiration check interval (manages expired records). Default is 1 hour.
-- `CountersAggregateInterval` - interval to aggregate counter. Default is 5 minutes.
-- `PrepareSchemaIfNecessary` - if set to `true`, it creates database tables. Default is `true`.
-- `DashboardJobListLimit` - dashboard job list limit. Default is 50000.
-- `TransactionTimeout` - transaction timeout. Default is 1 minute.
-- `DefaultSchema` - database schema into which the Hangfire tables will be created.  Default is database provider specific ("dbo" for SQL Server, "public" for PostgreSQL, etc).
-
-### How to limit number of open connections
-
-Number of opened connections depends on Hangfire worker count. You can limit worker count by setting `WorkerCount` property value in `BackgroundJobServerOptions`:
-```
-app.UseHangfireServer(
-   new BackgroundJobServerOptions
-   {
-      WorkerCount = 1
-   });
-```
-More info: http://hangfire.io/features.html#concurrency-level-control
-
-## Dashboard
-Hangfire provides a dashboard
-![Dashboard](https://camo.githubusercontent.com/f263ab4060a09e4375cc4197fb5bfe2afcacfc20/687474703a2f2f68616e67666972652e696f2f696d672f75692f64617368626f6172642d736d2e706e67)
-More info: [Hangfire Overview](http://hangfire.io/overview.html#integrated-monitoring-ui)
+- `TableCount` - increasing table count will lower latency and increase throughput, but also makes the backplane more "chatty".  Defaults to 1, and this implementation supports any number between 1 and 10.
+- `DefaultSchema` - database schema into which the tables will be created.  Default is database provider specific ("dbo" for SQL Server, "public" for PostgreSQL, etc).
 
 ## Build
 Please use Visual Studio or any other tool of your choice to build the solution
-
-## Test
-In order to run unit tests and integrational tests set the following variables in you system environment variables (restart of Visual Studio is required):
-
-`Hangfire_SqlServer_ConnectionStringTemplate` (default: `server=127.0.0.1;uid=root;pwd=root;database={0};Allow User Variables=True`)
-
-`Hangfire_SqlServer_DatabaseName` (default: `Hangfire.FluentNHibernate.Tests`)
 
 # Database Stuff
 
