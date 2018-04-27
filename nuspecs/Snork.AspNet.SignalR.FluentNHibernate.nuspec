@@ -1,0 +1,42 @@
+﻿<?xml version="1.0"?>
+
+<package>
+  <metadata>
+    <id>Snork.AspNet.SignalR.FluentNHibernate</id>
+    <version>1.1.0</version>
+    <authors>Xavier Jefferson</authors>
+    <owners>XavierJefferson</owners>
+    <licenseUrl>https://www.gnu.org/licenses/lgpl-3.0.en.html</licenseUrl>
+    <projectUrl>https://github.com/xavierjefferson/Snork.AspNet.SignalR.FluentNHibernate</projectUrl>
+    <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A SignalR backplane provider for SQL Server, MySQL, Oracle, DB/2, PostgreSQL, and Firebird</description>
+    <releaseNotes>
+      Initial release
+    </releaseNotes>
+    <copyright>Copyright © 2018 Xavier Jefferson</copyright>
+    <tags>signalr backplace mssql mysql oracle postgresql firebird db2</tags>
+    <dependencies>
+	 
+	
+	  <dependency id="FluentNHibernate" version="2.0.3.0" />
+  <dependency id="Iesi.Collections" version="4.0.0.4000" t  />
+  
+  <dependency id="Microsoft.AspNet.SignalR.Core" version="2.2.3"   />
+  <dependency id="Microsoft.Owin" version="2.1.0"  />
+  <dependency id="Microsoft.Owin.Host.SystemWeb" version="2.1.0"   />
+  <dependency id="Microsoft.Owin.Security" version="2.1.0"   />
+  <dependency id="Newtonsoft.Json" version="6.0.4"   />
+  <dependency id="NHibernate" version="4.0.0.4000"   />
+  <dependency id="Owin" version="1.0"  />
+  <dependency id="Snork.FluentNHibernateTools" version="1.1.6600"  />
+    </dependencies>
+
+
+  </metadata>
+  <files>
+    <file src="..\Snork.AspNet.SignalR.FluentNHibernate\bin\debug\Snork.AspNet.SignalR.FluentNHibernate.dll" target="lib\net45" />
+    <file src="..\Snork.AspNet.SignalR.FluentNHibernate\bin\debug\Snork.AspNet.SignalR.FluentNHibernate.pdb" target="lib\net45" />
+    <file src="..\Snork.AspNet.SignalR.FluentNHibernate\**\*.cs;" target="src" exclude="**\obj*\**\*.cs" />
+  </files>
+</package>
