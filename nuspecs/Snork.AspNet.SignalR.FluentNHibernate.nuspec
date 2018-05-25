@@ -3,7 +3,7 @@
 <package>
   <metadata>
     <id>Snork.AspNet.SignalR.FluentNHibernate</id>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <authors>Xavier Jefferson</authors>
     <owners>XavierJefferson</owners>
     <licenseUrl>https://www.gnu.org/licenses/lgpl-3.0.en.html</licenseUrl>
@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A SignalR backplane provider for SQL Server, MySQL, Oracle, DB/2, PostgreSQL, and Firebird</description>
     <releaseNotes>
-      Fix cleanup bug
+      Fix cleanup bug again
     </releaseNotes>
     <copyright>Copyright © 2018 Xavier Jefferson</copyright>
     <tags>signalr backplace mssql mysql oracle postgresql firebird db2</tags>
