@@ -85,7 +85,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                                 var overMaxBy = rowCount - maxTableSize;
                                 var endPayloadId = minPayloadId + blockSize - overMaxBy;
                                 var sql = string.Format("delete from `{0}` where {1} between :min and :max",
-                                    nameof(TMessageType),
+                                    typeof(TMessageType).Name,
                                     nameof(MessagesItemBase.PayloadId));
                                 result = session.CreateQuery(sql)
                                     .SetParameter("min", minPayloadId)
