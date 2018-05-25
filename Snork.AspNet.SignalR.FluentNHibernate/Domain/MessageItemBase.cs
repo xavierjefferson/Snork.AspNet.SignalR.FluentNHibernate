@@ -2,9 +2,9 @@ using System;
 
 namespace Snork.AspNet.SignalR.FluentNHibernate.Domain
 {
-    public abstract class MessageItemBase
+    public abstract class MessagesItemBase
     {
-        public MessageItemBase()
+        public MessagesItemBase()
         {
             InsertedOn = DateTime.UtcNow;
         }

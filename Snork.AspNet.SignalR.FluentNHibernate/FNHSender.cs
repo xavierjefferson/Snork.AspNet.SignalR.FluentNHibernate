@@ -11,7 +11,7 @@ using Snork.AspNet.SignalR.FluentNHibernate.Domain;
 
 namespace Snork.AspNet.SignalR.FluentNHibernate
 {
-    internal class FNHSender<TMessageType, TIdType> where TMessageType : MessageItemBase, new()
+    internal class FNHSender<TMessageType, TIdType> where TMessageType : MessagesItemBase, new()
         where TIdType : MessageIdItemBase, new()
     {
         private readonly ISessionFactory _sessionFactory;
@@ -86,7 +86,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                                 var endPayloadId = minPayloadId + blockSize - overMaxBy;
                                 var sql = string.Format("delete from `{0}` where {1} between :min and :max",
                                     nameof(TMessageType),
-                                    nameof(MessageItemBase.PayloadId));
+                                    nameof(MessagesItemBase.PayloadId));
                                 result = session.CreateQuery(sql)
                                     .SetParameter("min", minPayloadId)
                                     .SetParameter("max", endPayloadId)

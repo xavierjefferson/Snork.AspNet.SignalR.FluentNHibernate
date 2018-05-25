@@ -14,7 +14,7 @@ using Timer = System.Timers.Timer;
 namespace Snork.AspNet.SignalR.FluentNHibernate
 {
     internal class FNHReceiver<TMessageType, TIdType> : IDisposable
-        where TMessageType : MessageItemBase where TIdType : MessageIdItemBase
+        where TMessageType : MessagesItemBase where TIdType : MessageIdItemBase
 
     {
         private const int interval = 5000;
@@ -113,20 +113,20 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                 {
                     using (var session = _sessionFactory.OpenStatelessSession())
                     {
-                        var messages = session.Query<TMessageType>()
+                        var messagesItems = session.Query<TMessageType>()
                             .OrderBy(i => i.PayloadId)
                             .Where(i => i.PayloadId > _lastPayloadId);
 
                         Queried();
 
-                        if (messages.Any())
+                        if (messagesItems.Any())
                         {
                             _trace.TraceVerbose("found messages");
                         }
-                        foreach (var record in messages)
+                        foreach (var messageItem in messagesItems)
                         {
-                            var id = record.PayloadId;
-                            var message = FNHPayload.FromBytes(record);
+                            var id = messageItem.PayloadId;
+                            var scaleoutMessage = FNHPayload.FromBytes(messageItem);
 
                             _trace.TraceVerbose("{0}SqlReceiver last payload ID={1}, new payload ID={2}", _tracePrefix,
                                 _lastPayloadId, id);
@@ -147,9 +147,16 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                             _lastPayloadId = id;
 
                             _trace.TraceVerbose("{0}Payload {1} containing {2} message(s) received", _tracePrefix, id,
-                                message.Messages.Count);
-
-                            Received((ulong) id, message);
+                                scaleoutMessage.Messages.Count);
+                            foreach (var message in scaleoutMessage.Messages)
+                            {
+                                if (message.Value.Array != null)
+                                {
+                                    var valueArray = message.Value.Array;
+                                    _trace.TraceVerbose(System.Text.Encoding.UTF8.GetString(valueArray));
+                                }
+                            }
+                            Received((ulong) id, scaleoutMessage);
                         }
                     }
                 }

@@ -4,7 +4,7 @@ using Snork.AspNet.SignalR.FluentNHibernate.Domain;
 
 namespace Snork.AspNet.SignalR.FluentNHibernate.Mapping
 {
-    public abstract class MessageItemMapBase<T> : ClassMap<T> where T : MessageItemBase
+    public abstract class MessageItemMapBase<T> : ClassMap<T> where T : MessagesItemBase
     {
         private static readonly Regex rx = new Regex("(\\d+)", RegexOptions.Compiled);
 

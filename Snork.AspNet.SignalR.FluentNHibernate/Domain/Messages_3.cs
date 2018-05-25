@@ -1,6 +1,6 @@
 namespace Snork.AspNet.SignalR.FluentNHibernate.Domain
 {
-    public class Messages_3 : MessageItemBase
+    public class Messages_3 : MessagesItemBase
     {
     }
 }

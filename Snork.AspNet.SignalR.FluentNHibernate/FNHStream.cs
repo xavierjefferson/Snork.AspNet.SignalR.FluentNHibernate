@@ -9,7 +9,7 @@ using Snork.AspNet.SignalR.FluentNHibernate.Domain;
 
 namespace Snork.AspNet.SignalR.FluentNHibernate
 {
-    internal class FNHStream<TMessageType, TIdType> : IStream where TMessageType : MessageItemBase, new()
+    internal class FNHStream<TMessageType, TIdType> : IStream where TMessageType : MessagesItemBase, new()
         where TIdType : MessageIdItemBase, new()
     {
         private readonly FNHReceiver<TMessageType, TIdType> _receiver;

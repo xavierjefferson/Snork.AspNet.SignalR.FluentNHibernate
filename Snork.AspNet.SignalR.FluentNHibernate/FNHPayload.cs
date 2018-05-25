@@ -18,7 +18,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
             return message.ToBytes();
         }
 
-        public static ScaleoutMessage FromBytes<T>(T record) where T : MessageItemBase
+        public static ScaleoutMessage FromBytes<T>(T record) where T : MessagesItemBase
         {
             var message = ScaleoutMessage.FromBytes(record.Payload);
 
