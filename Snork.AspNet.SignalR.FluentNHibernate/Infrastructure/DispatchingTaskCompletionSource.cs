@@ -6,46 +6,46 @@ namespace Snork.AspNet.SignalR.FluentNHibernate.Infrastructure
 {
     internal class DispatchingTaskCompletionSource<TResult>
     {
-        private readonly TaskCompletionSource<TResult> _tcs = new TaskCompletionSource<TResult>();
+        private readonly TaskCompletionSource<TResult> _taskCompletionSource = new TaskCompletionSource<TResult>();
 
         public Task<TResult> Task
         {
-            get { return _tcs.Task; }
+            get { return _taskCompletionSource.Task; }
         }
 
         public void SetCanceled()
         {
-            TaskAsyncHelper.Dispatch(() => _tcs.SetCanceled());
+            TaskAsyncHelper.Dispatch(() => _taskCompletionSource.SetCanceled());
         }
 
         public void SetException(Exception exception)
         {
-            TaskAsyncHelper.Dispatch(() => _tcs.SetException(exception));
+            TaskAsyncHelper.Dispatch(() => _taskCompletionSource.SetException(exception));
         }
 
         public void SetException(IEnumerable<Exception> exceptions)
         {
-            TaskAsyncHelper.Dispatch(() => _tcs.SetException(exceptions));
+            TaskAsyncHelper.Dispatch(() => _taskCompletionSource.SetException(exceptions));
         }
 
         public void SetResult(TResult result)
         {
-            TaskAsyncHelper.Dispatch(() => _tcs.SetResult(result));
+            TaskAsyncHelper.Dispatch(() => _taskCompletionSource.SetResult(result));
         }
 
         public void TrySetCanceled()
         {
-            TaskAsyncHelper.Dispatch(() => _tcs.TrySetCanceled());
+            TaskAsyncHelper.Dispatch(() => _taskCompletionSource.TrySetCanceled());
         }
 
         public void TrySetException(Exception exception)
         {
-            TaskAsyncHelper.Dispatch(() => _tcs.TrySetException(exception));
+            TaskAsyncHelper.Dispatch(() => _taskCompletionSource.TrySetException(exception));
         }
 
         public void TrySetException(IEnumerable<Exception> exceptions)
         {
-            TaskAsyncHelper.Dispatch(() => _tcs.TrySetException(exceptions));
+            TaskAsyncHelper.Dispatch(() => _taskCompletionSource.TrySetException(exceptions));
         }
 
         public void SetUnwrappedException(Exception e)
@@ -76,7 +76,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate.Infrastructure
 
         public void TrySetResult(TResult result)
         {
-            TaskAsyncHelper.Dispatch(() => _tcs.TrySetResult(result));
+            TaskAsyncHelper.Dispatch(() => _taskCompletionSource.TrySetResult(result));
         }
     }
 }

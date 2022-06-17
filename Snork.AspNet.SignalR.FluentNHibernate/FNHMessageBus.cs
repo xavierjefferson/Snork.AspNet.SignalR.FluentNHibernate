@@ -37,7 +37,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         {
             _serviceProvider = serviceProvider;
             _logger = serviceProvider.GetService<ILogger<FNHMessageBus>>();
-            _configuration = configuration ?? throw new ArgumentNullException("configuration");
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             var traceManager = resolver.Resolve<ITraceManager>();
             _trace = traceManager[typeof(FNHMessageBus).FullName];
             _trace.Listeners.Add(new LoggerListener(_logger));
@@ -71,40 +71,34 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
 
         private void Initialize(object state)
         {
-            try
-            {
-                var sessionFactoryInfo = SessionFactoryBuilder.GetFromAssemblyOf<Message0Map>(
-                    _configuration.ProviderType, _configuration.ConnectionString,
-                    new FluentNHibernatePersistenceBuilderOptions {DefaultSchema = _configuration.DefaultSchema});
-                var sessionFactory = sessionFactoryInfo.SessionFactory;
-                // NOTE: Called from a ThreadPool thread
-                _logger.LogInformation("Message bus initializing.");
+            var sessionFactoryInfo = SessionFactoryBuilder.GetFromAssemblyOf<Message0Map>(
+                _configuration.ProviderType, _configuration.ConnectionString,
+                new FluentNHibernatePersistenceBuilderOptions {DefaultSchema = _configuration.DefaultSchema});
+            var sessionFactory = sessionFactoryInfo.SessionFactory;
+            // NOTE: Called from a ThreadPool thread
+            _logger.LogInformation("Message bus initializing.");
 
-                var collection = new List<IStream>
-                {
-                    new FNHStream<Messages_0, Messages_0_Id>(0, sessionFactory, _serviceProvider),
-                    new FNHStream<Messages_1, Messages_1_Id>(1, sessionFactory, _serviceProvider),
-                    new FNHStream<Messages_2, Messages_2_Id>(2, sessionFactory, _serviceProvider),
-                    new FNHStream<Messages_3, Messages_3_Id>(3, sessionFactory, _serviceProvider),
-                    new FNHStream<Messages_4, Messages_4_Id>(4, sessionFactory, _serviceProvider),
-                    new FNHStream<Messages_5, Messages_5_Id>(5, sessionFactory, _serviceProvider),
-                    new FNHStream<Messages_6, Messages_6_Id>(6, sessionFactory, _serviceProvider),
-                    new FNHStream<Messages_7, Messages_7_Id>(7, sessionFactory, _serviceProvider),
-                    new FNHStream<Messages_8, Messages_8_Id>(8, sessionFactory, _serviceProvider),
-                    new FNHStream<Messages_9, Messages_9_Id>(9, sessionFactory, _serviceProvider)
-                };
-                _streams.AddRange(collection.Take(_configuration.TableCount));
-                foreach (var stream in _streams)
-                {
-                    stream.Queried += () => Open(stream.StreamIndex);
-                    stream.Faulted += ex => OnError(stream.StreamIndex, ex);
-                    stream.Received += (id, messages) => OnReceived(stream.StreamIndex, id, messages);
-                    StartReceiving(stream);
-                }
-            }
-            catch (Exception ex)
+            var collection = new List<IStream>
             {
-                _logger.LogError(ex, "Issue");
+                new FNHStream<Messages_0, Messages_0_Id>(0, sessionFactory, _serviceProvider, _configuration),
+                new FNHStream<Messages_1, Messages_1_Id>(1, sessionFactory, _serviceProvider, _configuration),
+                new FNHStream<Messages_2, Messages_2_Id>(2, sessionFactory, _serviceProvider, _configuration),
+                new FNHStream<Messages_3, Messages_3_Id>(3, sessionFactory, _serviceProvider, _configuration),
+                new FNHStream<Messages_4, Messages_4_Id>(4, sessionFactory, _serviceProvider, _configuration),
+                new FNHStream<Messages_5, Messages_5_Id>(5, sessionFactory, _serviceProvider, _configuration),
+                new FNHStream<Messages_6, Messages_6_Id>(6, sessionFactory, _serviceProvider, _configuration),
+                new FNHStream<Messages_7, Messages_7_Id>(7, sessionFactory, _serviceProvider, _configuration),
+                new FNHStream<Messages_8, Messages_8_Id>(8, sessionFactory, _serviceProvider, _configuration),
+                new FNHStream<Messages_9, Messages_9_Id>(9, sessionFactory, _serviceProvider, _configuration)
+            };
+            _streams.AddRange(collection.Take(_configuration.TableCount));
+
+            foreach (var stream in _streams)
+            {
+                stream.Queried += () => Open(stream.StreamIndex);
+                stream.Faulted += ex => OnError(stream.StreamIndex, ex);
+                stream.Received += (id, messages) => OnReceived(stream.StreamIndex, id, messages);
+                StartReceiving(stream);
             }
         }
 
@@ -140,7 +134,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
 
             public LoggerListener(ILogger<FNHMessageBus> logger)
             {
-                this._logger = logger;
+                _logger = logger;
             }
 
             public override void Fail(string message)

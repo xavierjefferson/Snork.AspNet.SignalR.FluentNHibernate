@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Messaging;
@@ -17,10 +16,10 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         private readonly ILogger<FNHStream<TMessageType, TIdType>> _logger;
         private readonly FNHReceiver<TMessageType, TIdType> _receiver;
         private readonly FNHSender<TMessageType, TIdType> _sender;
-     
+
         private readonly string _tracePrefix;
 
-        public FNHStream(int streamIndex, ISessionFactory sessionFactory, IServiceProvider serviceProvider)
+        public FNHStream(int streamIndex, ISessionFactory sessionFactory, IServiceProvider serviceProvider, FNHScaleoutConfiguration configuration)
         {
             _logger = serviceProvider.GetService<ILogger<FNHStream<TMessageType, TIdType>>>();
             StreamIndex = streamIndex;
@@ -33,7 +32,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
             _sender = new FNHSender<TMessageType, TIdType>(sessionFactory,
                 serviceProvider.GetService<ILogger<FNHSender<TMessageType, TIdType>>>());
             _receiver = new FNHReceiver<TMessageType, TIdType>(sessionFactory, _tracePrefix,
-                serviceProvider.GetService<ILogger<FNHReceiver<TMessageType, TIdType>>>());
+                serviceProvider.GetService<ILogger<FNHReceiver<TMessageType, TIdType>>>(), configuration);
             _receiver.Queried += () => Queried();
             _receiver.Faulted += ex => Faulted(ex);
             _receiver.Received += (id, messages) => Received(id, messages);

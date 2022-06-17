@@ -37,7 +37,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         public static IDependencyResolver UseFluentNHibernate(this IDependencyResolver resolver,
             FNHScaleoutConfiguration configuration, IServiceProvider serviceProvider = null)
         {
-            if (resolver == null) throw new ArgumentNullException("resolver");
+            if (resolver == null) throw new ArgumentNullException(nameof(resolver));
 
             if (serviceProvider == null)
             {
@@ -53,10 +53,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                         $"Configured service provider must provide logging {typeof(ILogger).FullName}");
             }
 
-            var bus = new Lazy<FNHMessageBus>(() =>
-            {
-                return new FNHMessageBus(resolver, configuration, serviceProvider);
-            });
+            var bus = new Lazy<FNHMessageBus>(() => new FNHMessageBus(resolver, configuration, serviceProvider));
             resolver.Register(typeof(IMessageBus), () => bus.Value);
 
             return resolver;

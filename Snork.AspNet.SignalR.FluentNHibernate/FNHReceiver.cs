@@ -16,26 +16,28 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         where TMessageType : MessagesItemBase where TIdType : MessageIdItemBase
 
     {
-        private const int interval = 5000;
+       
         private readonly ILogger<FNHReceiver<TMessageType, TIdType>> _logger;
+        private readonly Mutex _mutex = new Mutex(false);
 
         private readonly ISessionFactory _sessionFactory;
 
 
         private readonly string _tracePrefix;
-        private readonly Mutex mutex = new Mutex(false);
+        private readonly FNHScaleoutConfiguration _configuration;
 
         private long? _lastPayloadId;
 
         private Timer _timer;
 
         public FNHReceiver(ISessionFactory sessionFactory,
-            string tracePrefix, ILogger<FNHReceiver<TMessageType, TIdType>> logger)
+            string tracePrefix, ILogger<FNHReceiver<TMessageType, TIdType>> logger,
+            FNHScaleoutConfiguration configuration)
         {
             _sessionFactory = sessionFactory;
             _tracePrefix = tracePrefix;
             _logger = logger;
-
+            _configuration = configuration;
 
             Queried += () => { };
             Received += (_, __) => { };
@@ -97,7 +99,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
             TryReceive();
             if (_timer == null)
             {
-                _timer = new Timer(interval);
+                _timer = new Timer(_configuration.ReceivePollInterval.TotalMilliseconds);
                 _timer.Elapsed += (a, b) => { TryReceive(); };
                 _timer.Start();
             }
@@ -106,7 +108,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         private void TryReceive()
         {
             _logger.LogDebug("Trying receive");
-            if (mutex.WaitOne(interval))
+            if (_mutex.WaitOne(_configuration.ReceivePollInterval))
             {
                 _logger.LogDebug("Not locked out");
                 try
@@ -138,14 +140,18 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
 
                             _lastPayloadId = id;
 
-                            _logger.LogDebug("{0}Payload {1} containing {2} message(s) received", _tracePrefix, id,
-                                scaleoutMessage.Messages.Count);
-                            foreach (var message in scaleoutMessage.Messages)
-                                if (message.Value.Array != null)
-                                {
-                                    var valueArray = message.Value.Array;
-                                    _logger.LogDebug(Encoding.UTF8.GetString(valueArray));
-                                }
+                            if (_logger.IsEnabled(LogLevel.Debug))
+                            {
+                                _logger.LogDebug("{0}Payload {1} containing {2} message(s) received", _tracePrefix, id,
+                                    scaleoutMessage.Messages.Count);
+
+                                foreach (var message in scaleoutMessage.Messages)
+                                    if (message.Value.Array != null)
+                                    {
+                                        var valueArray = message.Value.Array;
+                                        _logger.LogDebug(Encoding.UTF8.GetString(valueArray));
+                                    }
+                            }
 
                             Received((ulong) id, scaleoutMessage);
                         }
@@ -157,7 +163,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                 }
                 finally
                 {
-                    mutex.ReleaseMutex();
+                    _mutex.ReleaseMutex();
                 }
             }
             else
