@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Messaging;
+using Microsoft.Extensions.Logging;
 using NHibernate;
-using NHibernate.Linq;
 using Snork.AspNet.SignalR.FluentNHibernate.Domain;
 
 namespace Snork.AspNet.SignalR.FluentNHibernate
@@ -14,22 +13,19 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
     internal class FNHSender<TMessageType, TIdType> where TMessageType : MessagesItemBase, new()
         where TIdType : MessageIdItemBase, new()
     {
+        private readonly ILogger<FNHSender<TMessageType, TIdType>> _logger;
         private readonly ISessionFactory _sessionFactory;
-        private readonly TraceSource _trace;
 
-        public FNHSender(ISessionFactory sessionFactory, TraceSource traceSource)
+        public FNHSender(ISessionFactory sessionFactory,
+            ILogger<FNHSender<TMessageType, TIdType>> logger)
         {
             _sessionFactory = sessionFactory;
-
-            _trace = traceSource;
+            _logger = logger;
         }
 
         public Task Send(IList<Message> messages)
         {
-            if (messages == null || messages.Count == 0)
-            {
-                return TaskAsyncHelper.Empty;
-            }
+            if (messages == null || messages.Count == 0) return TaskAsyncHelper.Empty;
             var count = InsertMessage(messages);
             return Task.FromResult(count);
         }
@@ -40,7 +36,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         {
             try
             {
-                _trace.TraceVerbose("inserting");
+                _logger.LogDebug("inserting");
                 int result;
                 using (var session = _sessionFactory.OpenSession())
                 {
@@ -58,6 +54,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                             messageId.PayloadId++;
                             session.Save(messageId);
                         }
+
                         newPayloadId = messageId.PayloadId;
                         session.Save(new TMessageType
                         {
@@ -66,11 +63,11 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                         });
                         tx.Commit();
                     }
+
                     result = 1;
                     var maxTableSize = 10000;
                     var blockSize = 2500;
                     if (newPayloadId % blockSize == 0)
-                    {
                         using (var tx = session.BeginTransaction(IsolationLevel.Serializable))
                         {
                             var queryable = session.Query<TMessageType>();
@@ -92,15 +89,16 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                                     .SetParameter("max", endPayloadId)
                                     .ExecuteUpdate();
                             }
+
                             tx.Commit();
                         }
-                    }
                 }
+
                 return result;
             }
             catch (Exception ex)
             {
-                _trace.TraceError("Issue with send", ex);
+                _logger.LogError(ex, "Issue with send");
                 throw;
             }
         }

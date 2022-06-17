@@ -177,9 +177,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
             // Observe Exception
 #if SERVER
             if (traceSource != null)
-            {
                 traceSource.TraceEvent(TraceEventType.Warning, 0, "Exception thrown by Task: {0}", exception);
-            }
 #else
             if (connection != null)
             {
@@ -236,29 +234,21 @@ null) where TTask : Task
                     task.ContinueWithPreservedCulture(t =>
                         {
                             if (t.IsFaulted || t.IsCanceled)
-                            {
                                 try
                                 {
                                     action();
 
                                     if (t.IsFaulted)
-                                    {
                                         tcs.TrySetUnwrappedException(t.Exception);
-                                    }
                                     else
-                                    {
                                         tcs.TrySetCanceled();
-                                    }
                                 }
                                 catch (Exception e)
                                 {
                                     tcs.TrySetException(e);
                                 }
-                            }
                             else
-                            {
                                 tcs.TrySetResult(null);
-                            }
                         },
                         TaskContinuationOptions.ExecuteSynchronously);
 
@@ -273,13 +263,8 @@ null) where TTask : Task
             task.ContinueWithPreservedCulture(t =>
                 {
                     if (t.IsFaulted)
-                    {
                         tcs.SetUnwrappedException(t.Exception);
-                    }
-                    else if (t.IsCanceled)
-                    {
-                        tcs.SetCanceled();
-                    }
+                    else if (t.IsCanceled) tcs.SetCanceled();
                 },
                 TaskContinuationOptions.NotOnRanToCompletion);
         }
@@ -291,17 +276,11 @@ null) where TTask : Task
             task.ContinueWithPreservedCulture(t =>
                 {
                     if (t.IsFaulted)
-                    {
                         tcs.TrySetUnwrappedException(t.Exception);
-                    }
                     else if (t.IsCanceled)
-                    {
                         tcs.TrySetCanceled();
-                    }
                     else
-                    {
                         tcs.TrySetResult(null);
-                    }
                 },
                 TaskContinuationOptions.ExecuteSynchronously);
 
@@ -315,17 +294,11 @@ null) where TTask : Task
             task.ContinueWithPreservedCulture(t =>
             {
                 if (t.IsFaulted)
-                {
                     tcs.TrySetUnwrappedException(t.Exception);
-                }
                 else if (t.IsCanceled)
-                {
                     tcs.TrySetCanceled();
-                }
                 else
-                {
                     tcs.TrySetResult(t.Result);
-                }
             });
         }
 
@@ -998,13 +971,9 @@ null) where TTask : Task
         {
             var aggregateException = e as AggregateException;
             if (aggregateException != null)
-            {
                 tcs.SetException(aggregateException.InnerExceptions);
-            }
             else
-            {
                 tcs.SetException(e);
-            }
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification =
@@ -1012,10 +981,7 @@ null) where TTask : Task
         internal static bool TrySetUnwrappedException<T>(this TaskCompletionSource<T> tcs, Exception e)
         {
             var aggregateException = e as AggregateException;
-            if (aggregateException != null)
-            {
-                return tcs.TrySetException(aggregateException.InnerExceptions);
-            }
+            if (aggregateException != null) return tcs.TrySetException(aggregateException.InnerExceptions);
             return tcs.TrySetException(e);
         }
 
@@ -1161,15 +1127,10 @@ null) where TTask : Task
             task.ContinueWithPreservedCulture(t =>
             {
                 if (t.IsFaulted)
-                {
                     tcs.SetUnwrappedException(t.Exception);
-                }
                 else if (t.IsCanceled)
-                {
                     tcs.SetCanceled();
-                }
                 else
-                {
                     try
                     {
                         successor();
@@ -1179,7 +1140,6 @@ null) where TTask : Task
                     {
                         tcs.SetUnwrappedException(ex);
                     }
-                }
             });
 
             return tcs.Task;
@@ -1199,19 +1159,13 @@ null) where TTask : Task
                     {
                         if (t.IsFaulted)
                         {
-                            if (!onlyOnSuccess)
-                            {
-                                next(state);
-                            }
+                            if (!onlyOnSuccess) next(state);
 
                             tcs.SetUnwrappedException(t.Exception);
                         }
                         else if (t.IsCanceled)
                         {
-                            if (!onlyOnSuccess)
-                            {
-                                next(state);
-                            }
+                            if (!onlyOnSuccess) next(state);
 
                             tcs.SetCanceled();
                         }
@@ -1241,15 +1195,10 @@ null) where TTask : Task
                 task.ContinueWithPreservedCulture(t =>
                 {
                     if (t.IsFaulted)
-                    {
                         tcs.SetUnwrappedException(t.Exception);
-                    }
                     else if (t.IsCanceled)
-                    {
                         tcs.SetCanceled();
-                    }
                     else
-                    {
                         try
                         {
                             successor(t.Result);
@@ -1259,7 +1208,6 @@ null) where TTask : Task
                         {
                             tcs.SetUnwrappedException(ex);
                         }
-                    }
                 });
 
                 return tcs.Task;
@@ -1274,15 +1222,10 @@ null) where TTask : Task
                 task.ContinueWithPreservedCulture(t =>
                 {
                     if (task.IsFaulted)
-                    {
                         tcs.SetUnwrappedException(t.Exception);
-                    }
                     else if (task.IsCanceled)
-                    {
                         tcs.SetCanceled();
-                    }
                     else
-                    {
                         try
                         {
                             successor(t);
@@ -1292,7 +1235,6 @@ null) where TTask : Task
                         {
                             tcs.SetUnwrappedException(ex);
                         }
-                    }
                 });
 
                 return tcs.Task;
@@ -1306,15 +1248,10 @@ null) where TTask : Task
                 task.ContinueWithPreservedCulture(t =>
                 {
                     if (t.IsFaulted)
-                    {
                         tcs.SetUnwrappedException(t.Exception);
-                    }
                     else if (t.IsCanceled)
-                    {
                         tcs.SetCanceled();
-                    }
                     else
-                    {
                         try
                         {
                             tcs.SetResult(successor());
@@ -1323,7 +1260,6 @@ null) where TTask : Task
                         {
                             tcs.SetUnwrappedException(ex);
                         }
-                    }
                 });
 
                 return tcs.Task;
@@ -1337,15 +1273,10 @@ null) where TTask : Task
                 task.ContinueWithPreservedCulture(t =>
                 {
                     if (task.IsFaulted)
-                    {
                         tcs.SetUnwrappedException(t.Exception);
-                    }
                     else if (task.IsCanceled)
-                    {
                         tcs.SetCanceled();
-                    }
                     else
-                    {
                         try
                         {
                             tcs.SetResult(successor(t));
@@ -1354,7 +1285,6 @@ null) where TTask : Task
                         {
                             tcs.SetUnwrappedException(ex);
                         }
-                    }
                 });
 
                 return tcs.Task;

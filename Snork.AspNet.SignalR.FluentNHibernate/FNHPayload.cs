@@ -9,10 +9,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
     {
         public static byte[] ToBytes(IList<Message> messages)
         {
-            if (messages == null)
-            {
-                throw new ArgumentNullException("messages");
-            }
+            if (messages == null) throw new ArgumentNullException("messages");
 
             var message = new ScaleoutMessage(messages);
             return message.ToBytes();

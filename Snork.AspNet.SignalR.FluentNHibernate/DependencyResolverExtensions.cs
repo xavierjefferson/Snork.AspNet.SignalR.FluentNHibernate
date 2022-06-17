@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Messaging;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Snork.FluentNHibernateTools;
 
 namespace Snork.AspNet.SignalR.FluentNHibernate
 {
     /// <summary>
-    /// 
     /// </summary>
     public static class DependencyResolverExtensions
     {
@@ -16,13 +17,14 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         /// <param name="resolver">The dependency resolver.</param>
         /// <param name="connectionString">The database connection string.</param>
         /// <param name="providerType"></param>
+        /// <param name="serviceProvider"></param>
         /// <returns>The dependency resolver.</returns>
         public static IDependencyResolver UseFluentNHibernate(this IDependencyResolver resolver,
-            string connectionString, ProviderTypeEnum providerType)
+            string connectionString, ProviderTypeEnum providerType, IServiceProvider serviceProvider = null)
         {
             var config = new FNHScaleoutConfiguration(connectionString, providerType);
 
-            return UseFluentNHibernate(resolver, config);
+            return UseFluentNHibernate(resolver, config, serviceProvider);
         }
 
         /// <summary>
@@ -30,17 +32,31 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         /// </summary>
         /// <param name="resolver">The dependency resolver.</param>
         /// <param name="configuration">The SQL scale-out configuration options.</param>
+        /// <param name="serviceProvider"></param>
         /// <returns>The dependency resolver.</returns>
         public static IDependencyResolver UseFluentNHibernate(this IDependencyResolver resolver,
-            FNHScaleoutConfiguration configuration)
+            FNHScaleoutConfiguration configuration, IServiceProvider serviceProvider = null)
         {
-            if (resolver == null)
+            if (resolver == null) throw new ArgumentNullException("resolver");
+
+            if (serviceProvider == null)
             {
-                throw new ArgumentNullException("resolver");
+                var sc = new ServiceCollection();
+                sc.AddLogging();
+                serviceProvider = sc.BuildServiceProvider();
+            }
+            else
+            {
+                var test = serviceProvider.GetService<ILogger<FNHMessageBus>>();
+                if (test == null)
+                    throw new ArgumentException(
+                        $"Configured service provider must provide logging {typeof(ILogger).FullName}");
             }
 
-
-            var bus = new Lazy<FNHMessageBus>(() => { return new FNHMessageBus(resolver, configuration); });
+            var bus = new Lazy<FNHMessageBus>(() =>
+            {
+                return new FNHMessageBus(resolver, configuration, serviceProvider);
+            });
             resolver.Register(typeof(IMessageBus), () => bus.Value);
 
             return resolver;

@@ -9,7 +9,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
     /// </summary>
     public class FNHScaleoutConfiguration : ScaleoutConfiguration
     {
-        private int _tableCount = 1;
+        private int _tableCount = 10;
 
         /// <summary>
         /// </summary>
@@ -18,10 +18,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         /// <exception cref="ArgumentNullException"></exception>
         public FNHScaleoutConfiguration(string connectionString, ProviderTypeEnum providerType)
         {
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                throw new ArgumentNullException("connectionString");
-            }
+            if (string.IsNullOrEmpty(connectionString)) throw new ArgumentNullException("connectionString");
             ProviderType = providerType;
             ConnectionString = connectionString;
         }
@@ -33,13 +30,10 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         /// </summary>
         public int TableCount
         {
-            get { return _tableCount; }
+            get => _tableCount;
             set
             {
-                if (value < 1 || value > 10)
-                {
-                    throw new ArgumentOutOfRangeException("value");
-                }
+                if (value < 1 || value > 10) throw new ArgumentOutOfRangeException("value");
                 _tableCount = value;
             }
         }
