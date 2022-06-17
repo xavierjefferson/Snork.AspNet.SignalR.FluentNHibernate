@@ -45,7 +45,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                 using (var session = _sessionFactory.OpenSession())
                 {
                     long newPayloadId;
-                    using (var tx = session.BeginTransaction(IsolationLevel.RepeatableRead))
+                    using (var tx = session.BeginTransaction(IsolationLevel.Serializable))
                     {
                         var messageId = session.Query<TIdType>().FirstOrDefault();
                         if (messageId == null)
@@ -71,7 +71,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                     var blockSize = 2500;
                     if (newPayloadId % blockSize == 0)
                     {
-                        using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                        using (var tx = session.BeginTransaction(IsolationLevel.Serializable))
                         {
                             var queryable = session.Query<TMessageType>();
                             var aggregates = queryable

@@ -71,24 +71,6 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                 // NOTE: Called from a ThreadPool thread
                 _trace.TraceInformation("Message bus initializing.");
 
-                while (true)
-                {
-                    try
-                    {
-                        var installer = new FNHInstaller(sessionFactory, _trace);
-                        installer.Install();
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        _trace.TraceError("Error trying to install database objects, trying again in 2 seconds: {0}",
-                            ex);
-
-                        // Try again in a little bit
-                        Thread.Sleep(2000);
-                    }
-                }
-
                 var collection = new List<IStream>
                 {
                     new FNHStream<Messages_0, Messages_0_Id>(0, sessionFactory, _trace),
