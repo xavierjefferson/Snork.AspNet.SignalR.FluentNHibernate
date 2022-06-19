@@ -75,31 +75,32 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                 _configuration.ProviderType, _configuration.ConnectionString,
                 new FluentNHibernatePersistenceBuilderOptions {DefaultSchema = _configuration.DefaultSchema});
             var sessionFactory = sessionFactoryInfo.SessionFactory;
-            var messageRepository = new MessageRepository(sessionFactory);
+            var messageRepository =
+                new MessageRepository(sessionFactory, _serviceProvider.GetService<ILogger<MessageRepository>>());
             // NOTE: Called from a ThreadPool thread
             _logger.LogInformation("Message bus initializing.");
 
             var collection = new List<IStream>
             {
-                new FNHStream<Messages_0, Messages_0_Id>(0, sessionFactory, _serviceProvider, _configuration,
+                new FNHStream<Messages_0, Messages_0_Id>(0, _serviceProvider, _configuration,
                     messageRepository),
-                new FNHStream<Messages_1, Messages_1_Id>(1, sessionFactory, _serviceProvider, _configuration,
+                new FNHStream<Messages_1, Messages_1_Id>(1, _serviceProvider, _configuration,
                     messageRepository),
-                new FNHStream<Messages_2, Messages_2_Id>(2, sessionFactory, _serviceProvider, _configuration,
+                new FNHStream<Messages_2, Messages_2_Id>(2, _serviceProvider, _configuration,
                     messageRepository),
-                new FNHStream<Messages_3, Messages_3_Id>(3, sessionFactory, _serviceProvider, _configuration,
+                new FNHStream<Messages_3, Messages_3_Id>(3, _serviceProvider, _configuration,
                     messageRepository),
-                new FNHStream<Messages_4, Messages_4_Id>(4, sessionFactory, _serviceProvider, _configuration,
+                new FNHStream<Messages_4, Messages_4_Id>(4, _serviceProvider, _configuration,
                     messageRepository),
-                new FNHStream<Messages_5, Messages_5_Id>(5, sessionFactory, _serviceProvider, _configuration,
+                new FNHStream<Messages_5, Messages_5_Id>(5, _serviceProvider, _configuration,
                     messageRepository),
-                new FNHStream<Messages_6, Messages_6_Id>(6, sessionFactory, _serviceProvider, _configuration,
+                new FNHStream<Messages_6, Messages_6_Id>(6, _serviceProvider, _configuration,
                     messageRepository),
-                new FNHStream<Messages_7, Messages_7_Id>(7, sessionFactory, _serviceProvider, _configuration,
+                new FNHStream<Messages_7, Messages_7_Id>(7, _serviceProvider, _configuration,
                     messageRepository),
-                new FNHStream<Messages_8, Messages_8_Id>(8, sessionFactory, _serviceProvider, _configuration,
+                new FNHStream<Messages_8, Messages_8_Id>(8, _serviceProvider, _configuration,
                     messageRepository),
-                new FNHStream<Messages_9, Messages_9_Id>(9, sessionFactory, _serviceProvider, _configuration,
+                new FNHStream<Messages_9, Messages_9_Id>(9, _serviceProvider, _configuration,
                     messageRepository)
             };
             _streams.AddRange(collection.Take(_configuration.TableCount));

@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Messaging;
 using Microsoft.Extensions.Logging;
-using NHibernate;
 using Snork.AspNet.SignalR.FluentNHibernate.Infrastructure;
 using Timer = System.Timers.Timer;
 
@@ -29,8 +28,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
 
         private Timer _timer;
 
-        public FNHReceiver(ISessionFactory sessionFactory,
-            string tracePrefix, ILogger<FNHReceiver> logger,
+        public FNHReceiver(string tracePrefix, ILogger<FNHReceiver> logger,
             FNHScaleoutConfiguration configuration, IMessageRepository messageRepository, int streamIndex)
         {
             _messageRepository = messageRepository;

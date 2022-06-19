@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NHibernate;
 using Snork.AspNet.SignalR.FluentNHibernate.Domain;
 
 namespace Snork.AspNet.SignalR.FluentNHibernate
@@ -16,11 +15,12 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         private readonly ILogger<FNHStream<TMessageType, TIdType>> _logger;
         private readonly FNHReceiver _receiver;
         private readonly FNHSender<TMessageType, TIdType> _sender;
-
+        private IMessageRepository _messageRepository;
         private readonly string _tracePrefix;
 
-        public FNHStream(int streamIndex, ISessionFactory sessionFactory, IServiceProvider serviceProvider, FNHScaleoutConfiguration configuration, IMessageRepository messageRepository)
+        public FNHStream(int streamIndex, IServiceProvider serviceProvider, FNHScaleoutConfiguration configuration, IMessageRepository messageRepository)
         {
+            _messageRepository = messageRepository;
             _logger = serviceProvider.GetService<ILogger<FNHStream<TMessageType, TIdType>>>();
             StreamIndex = streamIndex;
 
@@ -29,9 +29,8 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
             Queried += () => { };
             Received += (_, __) => { };
             Faulted += _ => { };
-            _sender = new FNHSender<TMessageType, TIdType>(sessionFactory,
-                serviceProvider.GetService<ILogger<FNHSender<TMessageType, TIdType>>>(), messageRepository, streamIndex);
-            _receiver = new FNHReceiver(sessionFactory, _tracePrefix,
+            _sender = new FNHSender<TMessageType, TIdType>(messageRepository, streamIndex);
+            _receiver = new FNHReceiver(_tracePrefix,
                 serviceProvider.GetService<ILogger<FNHReceiver>>(), configuration, messageRepository, streamIndex);
             _receiver.Queried += () => Queried();
             _receiver.Faulted += ex => Faulted(ex);
@@ -62,7 +61,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         {
             _logger.LogDebug("{0}Saving payload with {1} messages(s) to database", _tracePrefix, messages.Count,
                 StreamIndex);
-
+            
             return _sender.Send(messages);
         }
     }
