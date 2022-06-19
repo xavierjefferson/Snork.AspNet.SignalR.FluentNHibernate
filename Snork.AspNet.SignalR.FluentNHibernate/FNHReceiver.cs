@@ -6,38 +6,35 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Messaging;
 using Microsoft.Extensions.Logging;
 using NHibernate;
-using Snork.AspNet.SignalR.FluentNHibernate.Domain;
 using Snork.AspNet.SignalR.FluentNHibernate.Infrastructure;
 using Timer = System.Timers.Timer;
 
 namespace Snork.AspNet.SignalR.FluentNHibernate
 {
-    internal class FNHReceiver<TMessageType, TIdType> : IDisposable
-        where TMessageType : MessagesItemBase where TIdType : MessageIdItemBase
+    internal class FNHReceiver : IDisposable
+
 
     {
-       
-        private readonly ILogger<FNHReceiver<TMessageType, TIdType>> _logger;
-        private readonly Mutex _mutex = new Mutex(false);
+        private readonly FNHScaleoutConfiguration _configuration;
 
-        private readonly ISessionFactory _sessionFactory;
+        private readonly ILogger<FNHReceiver> _logger;
+        private readonly IMessageRepository _messageRepository;
+        private readonly Mutex _mutex = new Mutex(false);
+        private readonly int _streamIndex;
 
 
         private readonly string _tracePrefix;
-        private readonly FNHScaleoutConfiguration _configuration;
 
         private long? _lastPayloadId;
 
         private Timer _timer;
-        private IMessageRepository messageRepository;
-        private int streamIndex;
+
         public FNHReceiver(ISessionFactory sessionFactory,
-            string tracePrefix, ILogger<FNHReceiver<TMessageType, TIdType>> logger,
+            string tracePrefix, ILogger<FNHReceiver> logger,
             FNHScaleoutConfiguration configuration, IMessageRepository messageRepository, int streamIndex)
         {
-            this.messageRepository = messageRepository;
-            this.streamIndex = streamIndex;
-            _sessionFactory = sessionFactory;
+            _messageRepository = messageRepository;
+            _streamIndex = streamIndex;
             _tracePrefix = tracePrefix;
             _logger = logger;
             _configuration = configuration;
@@ -76,16 +73,12 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
             if (!_lastPayloadId.HasValue)
                 try
                 {
-                    using (var session = _sessionFactory.OpenStatelessSession())
-                    {
-                        _lastPayloadId = session.Query<TIdType>().Select(i => i.PayloadId).FirstOrDefault();
-                    }
+                    _lastPayloadId = _messageRepository.GetLastPayloadId(_streamIndex);
 
-                    //_lastPayloadId = (long?)lastPayloadIdOperation.ExecuteScalar();
                     Queried();
 
                     _logger.LogDebug(
-                        $"{_tracePrefix}{nameof(FNHReceiver<TMessageType, TIdType>)} started, initial payload id={_lastPayloadId}");
+                        $"{_tracePrefix}{nameof(FNHReceiver)} started, initial payload id={_lastPayloadId}");
 
 
                     // Complete the StartReceiving task as we've successfully initialized the payload ID
@@ -93,7 +86,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"{_tracePrefix}{nameof(FNHReceiver<TMessageType, TIdType>)} error starting ");
+                    _logger.LogError(ex, $"{_tracePrefix}{nameof(FNHReceiver)} error starting ");
 
                     //tcs.TrySetException(ex);
                     return;
@@ -116,48 +109,43 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                 _logger.LogDebug("Not locked out");
                 try
                 {
-                    using (var session = _sessionFactory.OpenStatelessSession())
+                    var messagesItems = _messageRepository.GetMessages(_streamIndex, _lastPayloadId);
+
+                    Queried();
+
+                    if (messagesItems.Any()) _logger.LogDebug("found messages");
+                    foreach (var messageItem in messagesItems)
                     {
-                        var messagesItems = session.Query<TMessageType>()
-                            .OrderBy(i => i.PayloadId)
-                            .Where(i => i.PayloadId > _lastPayloadId);
+                        var id = messageItem.PayloadId;
+                        var scaleoutMessage = FNHPayload.FromBytes(messageItem);
 
-                        Queried();
+                        _logger.LogDebug(
+                            $"{_tracePrefix}{nameof(FNHReceiver)} last payload ID={_lastPayloadId}, new payload ID={id}");
 
-                        if (messagesItems.Any()) _logger.LogDebug("found messages");
-                        foreach (var messageItem in messagesItems)
+                        if (id > _lastPayloadId + 1)
+                            _logger.LogError(
+                                $"{_tracePrefix}Missed message(s) from database. Expected payload ID {_lastPayloadId + 1} but got {id}.");
+                        else if (id <= _lastPayloadId)
+                            _logger.LogInformation(
+                                "{0}Duplicate message(s) or payload ID reset from database. Last payload ID {1}, this payload ID {2}",
+                                _tracePrefix, _lastPayloadId, id);
+
+                        _lastPayloadId = id;
+
+                        if (_logger.IsEnabled(LogLevel.Debug))
                         {
-                            var id = messageItem.PayloadId;
-                            var scaleoutMessage = FNHPayload.FromBytes(messageItem);
+                            _logger.LogDebug("{0}Payload {1} containing {2} message(s) received", _tracePrefix, id,
+                                scaleoutMessage.Messages.Count);
 
-                            _logger.LogDebug(
-                                $"{_tracePrefix}{nameof(FNHReceiver<TMessageType, TIdType>)} last payload ID={_lastPayloadId}, new payload ID={id}");
-
-                            if (id > _lastPayloadId + 1)
-                                _logger.LogError(
-                                    $"{_tracePrefix}Missed message(s) from database. Expected payload ID {_lastPayloadId + 1} but got {id}.");
-                            else if (id <= _lastPayloadId)
-                                _logger.LogInformation(
-                                    "{0}Duplicate message(s) or payload ID reset from database. Last payload ID {1}, this payload ID {2}",
-                                    _tracePrefix, _lastPayloadId, id);
-
-                            _lastPayloadId = id;
-
-                            if (_logger.IsEnabled(LogLevel.Debug))
-                            {
-                                _logger.LogDebug("{0}Payload {1} containing {2} message(s) received", _tracePrefix, id,
-                                    scaleoutMessage.Messages.Count);
-
-                                foreach (var message in scaleoutMessage.Messages)
-                                    if (message.Value.Array != null)
-                                    {
-                                        var valueArray = message.Value.Array;
-                                        _logger.LogDebug(Encoding.UTF8.GetString(valueArray));
-                                    }
-                            }
-
-                            Received((ulong) id, scaleoutMessage);
+                            foreach (var message in scaleoutMessage.Messages)
+                                if (message.Value.Array != null)
+                                {
+                                    var valueArray = message.Value.Array;
+                                    _logger.LogDebug(Encoding.UTF8.GetString(valueArray));
+                                }
                         }
+
+                        Received((ulong) id, scaleoutMessage);
                     }
                 }
                 catch (Exception ex)

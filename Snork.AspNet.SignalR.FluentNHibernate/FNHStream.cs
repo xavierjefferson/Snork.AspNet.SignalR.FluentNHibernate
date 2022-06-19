@@ -14,7 +14,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         where TIdType : MessageIdItemBase, new()
     {
         private readonly ILogger<FNHStream<TMessageType, TIdType>> _logger;
-        private readonly FNHReceiver<TMessageType, TIdType> _receiver;
+        private readonly FNHReceiver _receiver;
         private readonly FNHSender<TMessageType, TIdType> _sender;
 
         private readonly string _tracePrefix;
@@ -31,8 +31,8 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
             Faulted += _ => { };
             _sender = new FNHSender<TMessageType, TIdType>(sessionFactory,
                 serviceProvider.GetService<ILogger<FNHSender<TMessageType, TIdType>>>(), messageRepository, streamIndex);
-            _receiver = new FNHReceiver<TMessageType, TIdType>(sessionFactory, _tracePrefix,
-                serviceProvider.GetService<ILogger<FNHReceiver<TMessageType, TIdType>>>(), configuration, messageRepository, streamIndex);
+            _receiver = new FNHReceiver(sessionFactory, _tracePrefix,
+                serviceProvider.GetService<ILogger<FNHReceiver>>(), configuration, messageRepository, streamIndex);
             _receiver.Queried += () => Queried();
             _receiver.Faulted += ex => Faulted(ex);
             _receiver.Received += (id, messages) => Received(id, messages);
