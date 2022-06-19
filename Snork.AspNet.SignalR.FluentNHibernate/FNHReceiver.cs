@@ -29,11 +29,14 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         private long? _lastPayloadId;
 
         private Timer _timer;
-
+        private IMessageRepository messageRepository;
+        private int streamIndex;
         public FNHReceiver(ISessionFactory sessionFactory,
             string tracePrefix, ILogger<FNHReceiver<TMessageType, TIdType>> logger,
-            FNHScaleoutConfiguration configuration)
+            FNHScaleoutConfiguration configuration, IMessageRepository messageRepository, int streamIndex)
         {
+            this.messageRepository = messageRepository;
+            this.streamIndex = streamIndex;
             _sessionFactory = sessionFactory;
             _tracePrefix = tracePrefix;
             _logger = logger;

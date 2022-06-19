@@ -103,7 +103,7 @@
       <HintPath>..\packages\Remotion.Linq.EagerFetching.2.2.0\lib\net45\Remotion.Linq.EagerFetching.dll</HintPath>
     </Reference>
     <Reference Include="Snork.FluentNHibernateTools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Snork.FluentNHibernateTools.2.0.3\lib\netstandard2.0\Snork.FluentNHibernateTools.dll</HintPath>
+      <HintPath>..\..\SignalRSamples\packages\Snork.FluentNHibernateTools.2.0.3\lib\netstandard2.0\Snork.FluentNHibernateTools.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -199,6 +199,7 @@
     <Compile Include="Domain\Messages_8_Id.cs" />
     <Compile Include="Domain\Messages_9.cs" />
     <Compile Include="Domain\Messages_9_Id.cs" />
+    <Compile Include="IMessageRepository.cs" />
     <Compile Include="Infrastructure\DispatchingTaskCompletionSource.cs" />
     <Compile Include="IStream.cs" />
     <Compile Include="Mapping\Message0Map.cs" />
@@ -225,6 +226,7 @@
     <Compile Include="Mapping\Messages_7_IdMap.cs" />
     <Compile Include="Mapping\Messages_8_IdMap.cs" />
     <Compile Include="Mapping\Messages_9_IdMap.cs" />
+    <Compile Include="MessageRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FNHMessageBus.cs" />
     <Compile Include="FNHPayload.cs" />
@@ -233,6 +235,7 @@
     <Compile Include="FNHSender.cs" />
     <Compile Include="FNHMessageBusException.cs" />
     <Compile Include="FNHStream.cs" />
+    <Compile Include="TablenameHelper.cs" />
     <Compile Include="TaskAsyncHelper.cs" />
   </ItemGroup>
   <ItemGroup>

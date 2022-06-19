@@ -15,10 +15,13 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
     {
         private readonly ILogger<FNHSender<TMessageType, TIdType>> _logger;
         private readonly ISessionFactory _sessionFactory;
-
+        private IMessageRepository messageRepository;
+        private int streamIndex;
         public FNHSender(ISessionFactory sessionFactory,
-            ILogger<FNHSender<TMessageType, TIdType>> logger)
+            ILogger<FNHSender<TMessageType, TIdType>> logger, IMessageRepository messageRepository, int streamIndex)
         {
+            this.messageRepository = messageRepository;
+            this.streamIndex = streamIndex;
             _sessionFactory = sessionFactory;
             _logger = logger;
         }
