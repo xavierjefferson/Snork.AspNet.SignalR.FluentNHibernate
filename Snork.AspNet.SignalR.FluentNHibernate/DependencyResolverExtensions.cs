@@ -50,11 +50,14 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
                 var test = serviceProvider.GetService<ILogger<FNHMessageBus>>();
                 if (test == null)
                     throw new ArgumentException(
-                        $"Configured service provider must provide logging {typeof(ILogger).FullName}");
+                        $"Configured service provider must provide logging ({typeof(ILogger).FullName})");
             }
 
-            var bus = new Lazy<FNHMessageBus>(() => new FNHMessageBus(resolver, configuration, serviceProvider));
-            resolver.Register(typeof(IMessageBus), () => bus.Value);
+            var bus =
+                new FNHMessageBus(resolver, configuration, serviceProvider).WithRepository(c =>
+                    new FnhMessageRepository(configuration, serviceProvider.GetService<ILogger<FnhMessageRepository>>()));
+            bus.Start();
+            resolver.Register(typeof(IMessageBus), () => bus);
 
             return resolver;
         }

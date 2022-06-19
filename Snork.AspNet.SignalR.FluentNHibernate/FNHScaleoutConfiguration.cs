@@ -7,10 +7,8 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
     /// <summary>
     ///     Settings for the database scale-out message bus implementation.
     /// </summary>
-    public class FNHScaleoutConfiguration : ScaleoutConfiguration
+    public class FNHScaleoutConfiguration : CoreConfigurationBase
     {
-        private int _tableCount = 10;
-
         /// <summary>
         /// </summary>
         /// <param name="connectionString"></param>
@@ -23,23 +21,6 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
             ConnectionString = connectionString;
         }
 
-        /// <summary>
-        ///     The number of tables to store messages in. Using more tables reduces lock contention and may increase throughput.
-        ///     This must be consistent between all nodes in the web farm.
-        ///     Defaults to 1, max of 10 for this implementation.
-        /// </summary>
-        public int TableCount
-        {
-            get => _tableCount;
-            set
-            {
-                if (value < 1 || value > 10) throw new ArgumentOutOfRangeException(nameof(TableCount));
-                _tableCount = value;
-            }
-        }
-
-        public TimeSpan ReceivePollInterval { get; set; } = TimeSpan.FromSeconds(5);
-
 
         public string DefaultSchema { get; set; }
 
@@ -51,5 +32,8 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
         ///     The database connection string to use.
         /// </summary>
         public string ConnectionString { get; }
+
+        public long MaxTableSize { get; set; } = 10000;
+        public long MaxBlockSize { get; set; } = 2500;
     }
 }

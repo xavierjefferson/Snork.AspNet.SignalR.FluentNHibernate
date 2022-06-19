@@ -1,6 +1,6 @@
 ﻿namespace Snork.AspNet.SignalR.FluentNHibernate
 {
-    internal class TablenameHelper
+    internal class TableNameHelper
     {
         public static string GetIdTableName(int streamIndex)
         {

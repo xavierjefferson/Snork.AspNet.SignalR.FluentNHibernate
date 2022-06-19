@@ -14,7 +14,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
 
 
     {
-        private readonly FNHScaleoutConfiguration _configuration;
+        private readonly CoreConfigurationBase _configuration;
 
         private readonly ILogger<FNHReceiver> _logger;
         private readonly IMessageRepository _messageRepository;
@@ -28,12 +28,12 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
 
         private Timer _timer;
 
-        public FNHReceiver(string tracePrefix, ILogger<FNHReceiver> logger,
-            FNHScaleoutConfiguration configuration, IMessageRepository messageRepository, int streamIndex)
+        public FNHReceiver(int streamIndex, string logPrefix, ILogger<FNHReceiver> logger,
+            CoreConfigurationBase configuration, IMessageRepository messageRepository)
         {
             _messageRepository = messageRepository;
             _streamIndex = streamIndex;
-            _tracePrefix = tracePrefix;
+            _tracePrefix = logPrefix;
             _logger = logger;
             _configuration = configuration;
 
@@ -71,7 +71,7 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
             if (!_lastPayloadId.HasValue)
                 try
                 {
-                    _lastPayloadId = _messageRepository.GetLastPayloadId(_streamIndex);
+                    _lastPayloadId = _messageRepository.GetCurrentStreamPayloadId(_streamIndex);
 
                     Queried();
 
