@@ -10,12 +10,12 @@
     <projectUrl>https://github.com/xavierjefferson/Snork.AspNet.SignalR.FluentNHibernate</projectUrl>
     <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>A SignalR backplane provider for SQL Server, MySQL, Oracle, DB/2, PostgreSQL, and Firebird</description>
+    <description>A classic ASP.NET SignalR backplane provider for SQL Server, MySQL, Oracle, DB/2, PostgreSQL, SQLite and Firebird</description>
     <releaseNotes>
       Fix cleanup bug again
     </releaseNotes>
     <copyright>Copyright © 2018 Xavier Jefferson</copyright>
-    <tags>signalr backplace mssql mysql oracle postgresql firebird db2</tags>
+    <tags>signalr backplace mssql mysql oracle postgresql firebird db2 sqlite</tags>
     <dependencies>
 	 
 	
@@ -37,6 +37,8 @@
   <files>
     <file src="..\Snork.AspNet.SignalR.FluentNHibernate\bin\debug\Snork.AspNet.SignalR.FluentNHibernate.dll" target="lib\net45" />
     <file src="..\Snork.AspNet.SignalR.FluentNHibernate\bin\debug\Snork.AspNet.SignalR.FluentNHibernate.pdb" target="lib\net45" />
+    <file src="..\Snork.AspNet.SignalR.FluentNHibernate\bin\debug\Snork.AspNet.SignalR.Kore.dll" target="lib\net45" />
+    <file src="..\Snork.AspNet.SignalR.FluentNHibernate\bin\debug\Snork.AspNet.SignalR.Kore.pdb" target="lib\net45" />
     <file src="..\Snork.AspNet.SignalR.FluentNHibernate\**\*.cs;" target="src" exclude="**\obj*\**\*.cs" />
   </files>
 </package>

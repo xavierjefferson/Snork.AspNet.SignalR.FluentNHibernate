@@ -3,6 +3,8 @@ using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
+using Snork.AspNet.SignalR.Kore;
 using Snork.FluentNHibernateTools;
 
 namespace Snork.AspNet.SignalR.FluentNHibernate
@@ -47,15 +49,15 @@ namespace Snork.AspNet.SignalR.FluentNHibernate
             }
             else
             {
-                var test = serviceProvider.GetService<ILogger<FNHMessageBus>>();
+                var test = serviceProvider.GetService<ILogger<KoreMessageBus>>();
                 if (test == null)
                     throw new ArgumentException(
                         $"Configured service provider must provide logging ({typeof(ILogger).FullName})");
             }
 
             var bus =
-                new FNHMessageBus(resolver, configuration, serviceProvider).WithRepository(c =>
-                    new FnhMessageRepository(configuration, serviceProvider.GetService<ILogger<FnhMessageRepository>>()));
+                new KoreMessageBus(resolver, configuration, serviceProvider).WithRepository(c =>
+                    new FluentNHibernateMessageRepository(configuration, serviceProvider.GetService<ILogger<FluentNHibernateMessageRepository>>()));
             bus.Start();
             resolver.Register(typeof(IMessageBus), () => bus);
 

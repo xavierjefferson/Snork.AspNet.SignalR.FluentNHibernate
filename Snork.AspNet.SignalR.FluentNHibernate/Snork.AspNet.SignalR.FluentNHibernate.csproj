@@ -176,73 +176,69 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommonAssemblyInfo.cs" />
-    <Compile Include="CommonVersionInfo.cs" />
-    <Compile Include="CoreConfigurationBase.cs" />
+    <Compile Include="CancellationTokenExtensions.cs" />
     <Compile Include="DependencyResolverExtensions.cs" />
-    <Compile Include="Domain\MessageIdItemBase.cs" />
-    <Compile Include="Domain\MessageItemBase.cs" />
-    <Compile Include="Domain\Messages_1.cs" />
-    <Compile Include="Domain\Messages_1_Id.cs" />
-    <Compile Include="Domain\Messages_2.cs" />
-    <Compile Include="Domain\Messages_2_Id.cs" />
-    <Compile Include="Domain\Messages_3.cs" />
-    <Compile Include="Domain\Messages_3_Id.cs" />
-    <Compile Include="Domain\Messages_4.cs" />
-    <Compile Include="Domain\Messages_4_Id.cs" />
-    <Compile Include="Domain\Messages_5.cs" />
-    <Compile Include="Domain\Messages_5_Id.cs" />
-    <Compile Include="Domain\Messages_6.cs" />
-    <Compile Include="Domain\Messages_6_Id.cs" />
-    <Compile Include="Domain\Messages_7.cs" />
-    <Compile Include="Domain\Messages_7_Id.cs" />
-    <Compile Include="Domain\Messages_8.cs" />
-    <Compile Include="Domain\Messages_8_Id.cs" />
-    <Compile Include="Domain\Messages_9.cs" />
-    <Compile Include="Domain\Messages_9_Id.cs" />
-    <Compile Include="IMessageRepository.cs" />
-    <Compile Include="Infrastructure\DispatchingTaskCompletionSource.cs" />
-    <Compile Include="IStream.cs" />
-    <Compile Include="Mapping\Message0Map.cs" />
-    <Compile Include="Domain\Messages_0.cs" />
-    <Compile Include="Domain\Messages_0_Id.cs" />
-    <Compile Include="Mapping\Message1Map.cs" />
-    <Compile Include="Mapping\Message2Map.cs" />
-    <Compile Include="Mapping\Message3Map.cs" />
-    <Compile Include="Mapping\Message4Map.cs" />
-    <Compile Include="Mapping\Message5Map.cs" />
-    <Compile Include="Mapping\Message6Map.cs" />
-    <Compile Include="Mapping\Message7Map.cs" />
-    <Compile Include="Mapping\Message8Map.cs" />
-    <Compile Include="Mapping\Message9Map.cs" />
-    <Compile Include="Mapping\MessageIdItemMap.cs" />
-    <Compile Include="Mapping\MessageItemMapBase.cs" />
-    <Compile Include="Mapping\Messages_0_IdMap.cs" />
-    <Compile Include="Mapping\Messages_1_IdMap.cs" />
-    <Compile Include="Mapping\Messages_2_IdMap.cs" />
-    <Compile Include="Mapping\Messages_3_IdMap.cs" />
-    <Compile Include="Mapping\Messages_4_IdMap.cs" />
-    <Compile Include="Mapping\Messages_5_IdMap.cs" />
-    <Compile Include="Mapping\Messages_6_IdMap.cs" />
-    <Compile Include="Mapping\Messages_7_IdMap.cs" />
-    <Compile Include="Mapping\Messages_8_IdMap.cs" />
-    <Compile Include="Mapping\Messages_9_IdMap.cs" />
-    <Compile Include="FnhMessageRepository.cs" />
+    <Compile Include="Domain\MessageIdBase.cs" />
+    <Compile Include="Domain\MessagePayloadBase.cs" />
+    <Compile Include="Domain\MessagePayload_1.cs" />
+    <Compile Include="Domain\MessageId_1.cs" />
+    <Compile Include="Domain\MessagePayload_2.cs" />
+    <Compile Include="Domain\MessageId_2.cs" />
+    <Compile Include="Domain\MessagePayload_3.cs" />
+    <Compile Include="Domain\MessageId_3.cs" />
+    <Compile Include="Domain\MessagePayload_4.cs" />
+    <Compile Include="Domain\MessageId_4.cs" />
+    <Compile Include="Domain\MessagePayload_5.cs" />
+    <Compile Include="Domain\MessageId_5.cs" />
+    <Compile Include="Domain\MessagePayload_6.cs" />
+    <Compile Include="Domain\MessageId_6.cs" />
+    <Compile Include="Domain\MessagePayload_7.cs" />
+    <Compile Include="Domain\MessageId_7.cs" />
+    <Compile Include="Domain\MessagePayload_8.cs" />
+    <Compile Include="Domain\MessageId_8.cs" />
+    <Compile Include="Domain\MessagePayload_9.cs" />
+    <Compile Include="Domain\MessageId_9.cs" />
+    <Compile Include="FluentNHibernateMessageRepository.cs" />
+    <Compile Include="Mapping\MessagePayloadMap_0.cs" />
+    <Compile Include="Domain\MessagePayload_0.cs" />
+    <Compile Include="Domain\MessageId_0.cs" />
+    <Compile Include="Mapping\MessagePayloadMap_1.cs" />
+    <Compile Include="Mapping\MessagePayloadMap_2.cs" />
+    <Compile Include="Mapping\MessagePayloadMap_3.cs" />
+    <Compile Include="Mapping\MessagePayloadMap_4.cs" />
+    <Compile Include="Mapping\MessagePayloadMap_5.cs" />
+    <Compile Include="Mapping\MessagePayloadMap_6.cs" />
+    <Compile Include="Mapping\MessagePayloadMap_7.cs" />
+    <Compile Include="Mapping\MessagePayloadMap_8.cs" />
+    <Compile Include="Mapping\MessagePayloadMap_9.cs" />
+    <Compile Include="Mapping\MessageIdMapBase.cs" />
+    <Compile Include="Mapping\MessagePayloadMapBase.cs" />
+    <Compile Include="Mapping\MessageIdMap_0.cs" />
+    <Compile Include="Mapping\MessageIdMap_1.cs" />
+    <Compile Include="Mapping\MessageIdMap_2.cs" />
+    <Compile Include="Mapping\MessageIdMap_3.cs" />
+    <Compile Include="Mapping\MessageIdMap_4.cs" />
+    <Compile Include="Mapping\MessageIdMap_5.cs" />
+    <Compile Include="Mapping\MessageIdMap_6.cs" />
+    <Compile Include="Mapping\MessageIdMap_7.cs" />
+    <Compile Include="Mapping\MessageIdMap_8.cs" />
+    <Compile Include="Mapping\MessageIdMap_9.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FNHMessageBus.cs" />
-    <Compile Include="FNHPayload.cs" />
-    <Compile Include="FNHReceiver.cs" />
     <Compile Include="FNHScaleoutConfiguration.cs" />
-    <Compile Include="FNHMessageBusException.cs" />
-    <Compile Include="FNHStream.cs" />
+    <Compile Include="SqlUtils.cs" />
     <Compile Include="TableNameHelper.cs" />
-    <Compile Include="TaskAsyncHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Snork.AspNet.SignalR.Kore\Snork.AspNet.SignalR.Kore.csproj">
+      <Project>{bef9ed60-7830-4bc2-bc87-8d61a4c8fb23}</Project>
+      <Name>Snork.AspNet.SignalR.Kore</Name>
+    </ProjectReference>
   </ItemGroup>
   <!--<Import Project="..\Common\Microsoft.AspNet.SignalR.targets" />-->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

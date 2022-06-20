@@ -4,12 +4,12 @@
     {
         public static string GetIdTableName(int streamIndex)
         {
-            return $"Messages_{streamIndex}_Id";
+            return $"MessageId_{streamIndex}";
         }
 
-        public static string GetMessageTableName(int streamIndex)
+        public static string GetPayloadTableName(int streamIndex)
         {
-            return $"Messages_{streamIndex}";
+            return $"MessagePayload_{streamIndex}";
         }
     }
 }

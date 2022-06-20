@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject1", "UnitTestProject1\UnitTestProject1.csproj", "{977BDD18-BB65-402D-8A1D-4A6B0E0DEB42}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snork.AspNet.SignalR.Kore", "Snork.AspNet.SignalR.Kore\Snork.AspNet.SignalR.Kore.csproj", "{BEF9ED60-7830-4BC2-BC87-8D61A4C8FB23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{977BDD18-BB65-402D-8A1D-4A6B0E0DEB42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{977BDD18-BB65-402D-8A1D-4A6B0E0DEB42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{977BDD18-BB65-402D-8A1D-4A6B0E0DEB42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEF9ED60-7830-4BC2-BC87-8D61A4C8FB23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEF9ED60-7830-4BC2-BC87-8D61A4C8FB23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEF9ED60-7830-4BC2-BC87-8D61A4C8FB23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEF9ED60-7830-4BC2-BC87-8D61A4C8FB23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
